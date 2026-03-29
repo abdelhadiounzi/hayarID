@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HayatID - L'identité médicale portable du Maroc</title>
+    <meta name="description"
+        content="HayatID, votre dossier médical toujours sur vous. La startup de santé mobile marocaine récompensée au GITEX Africa 2026.">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Syne and DM Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400&family=Syne:wght@800&display=swap"
+        rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#060A12',
+                        primary: {
+                            glow: 'rgba(14, 165, 233, 0.15)', // sky-500
+                            DEFAULT: '#0ea5e9', // sky-500
+                            hover: '#0284c7' // sky-600
+                        },
+                        purple: {
+                            glow: 'rgba(168, 85, 247, 0.1)' // purple-500
+                        }
+                    },
+                    fontFamily: {
+                        syne: ['Syne', 'sans-serif'],
+                        sans: ['"DM Sans"', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'ping-slow': 'ping 3s cubic-bezier(0, 0, 0.2, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #060A12;
+            color: #ffffff;
+        }
+
+        /* Subtle Noise Overlay */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Fine Background Grid */
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+        }
+
+        /* Scroll Animations Initial State */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        /* Glowing Orbs */
+        .glow-primary {
+            background: radial-gradient(circle, var(--tw-colors-primary-glow) 0%, rgba(14, 165, 233, 0) 70%);
+        }
+
+        .glow-purple {
+            background: radial-gradient(circle, var(--tw-colors-purple-glow) 0%, rgba(168, 85, 247, 0) 70%);
+        }
+
+        /* Glassmorphism utility */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+
+<body class="relative min-h-screen overflow-x-hidden selection:bg-primary/30 selection:text-white">
+
+    <!-- Overlays -->
+    <div class="noise-overlay"></div>
+    <div class="fixed inset-0 bg-grid z-0 pointer-events-none"></div>
+
+    <!-- Glows -->
+    <div
+        class="fixed top-[-20%] left-[-10%] w-[60%] h-[60%] glow-primary rounded-full mix-blend-screen pointer-events-none blur-3xl opacity-50 z-0">
+    </div>
+    <div
+        class="fixed bottom-[-20%] right-[-10%] w-[60%] h-[60%] glow-purple rounded-full mix-blend-screen pointer-events-none blur-3xl opacity-50 z-0">
+    </div>
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-40 top-0 border-b border-white/5 bg-[#060A12]/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0 flex items-center gap-2 relative z-10">
+                    <i data-lucide="activity" class="text-primary w-8 h-8"></i>
+                    <span class="font-syne text-2xl tracking-wide text-white">HayatID</span>
+                </div>
+
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#mission"
+                            class="text-gray-300 hover:text-white transition-colors px-3 py-2 rounded-md text-sm font-medium">Mission</a>
+                        <a href="#equipe"
+                            class="text-gray-300 hover:text-white transition-colors px-3 py-2 rounded-md text-sm font-medium">Équipe</a>
+                        <a href="#contact"
+                            class="text-gray-300 hover:text-white transition-colors px-3 py-2 rounded-md text-sm font-medium">Contact</a>
+                    </div>
+                </div>
+
+                <div class="hidden md:flex items-center">
+                    <div
+                        class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-yellow-500 text-xs font-semibold uppercase tracking-wider">
+                        <span>🏆 GITEX Africa 2026</span>
+                    </div>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button type="button" class="text-gray-400 hover:text-white focus:outline-none"
+                        aria-controls="mobile-menu" aria-expanded="false"
+                        onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                        <i data-lucide="menu" class="h-6 w-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div class="hidden md:hidden bg-[#060A12] border-b border-white/5" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#mission"
+                    class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Mission</a>
+                <a href="#equipe"
+                    class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Équipe</a>
+                <a href="#contact"
+                    class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Contact</a>
+                <div class="mt-4 px-3">
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-yellow-500 text-xs font-semibold uppercase tracking-wider">
+                        <span>🏆 GITEX Africa 2026</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="relative z-10 pt-32 pb-16 lg:pt-48 lg:pb-32">
+        <!-- Hero Section -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center animate-on-scroll">
+            <div
+                class="inline-block mb-6 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary text-sm font-medium backdrop-blur-sm">
+                Révolutionner la santé digitale
+            </div>
+
+            <h1
+                class="font-syne text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500 mb-6 drop-shadow-sm">
+                HayatID
+            </h1>
+
+            <p class="mt-4 max-w-2xl mx-auto text-xl md:text-2xl text-gray-400 font-light mb-10">
+                L'identité médicale portable du Maroc.
+            </p>
+
+            <div class="flex justify-center mb-16">
+                <!-- Abstract Visual -->
+                <div class="relative w-72 h-72 md:w-96 md:h-96 flex items-center justify-center">
+                    <!-- Glow behind -->
+                    <div class="absolute inset-0 bg-primary/20 blur-2xl rounded-full"></div>
+
+                    <!-- Phone -->
+                    <div
+                        class="absolute left-[10%] top-[10%] w-[45%] h-[80%] border border-white/10 glass-panel rounded-3xl z-20 shadow-[-10px_10px_30px_rgba(0,0,0,0.5)] transform -rotate-6 transition-transform hover:-rotate-3 duration-500 flex flex-col items-center justify-between py-4">
+                        <div class="w-12 h-1 bg-white/20 rounded-full"></div>
+                        <div
+                            class="w-16 h-16 rounded-full border-2 border-primary/50 flex items-center justify-center animate-[pulse_2s_ease-in-out_infinite]">
+                            <i data-lucide="smartphone-nfc" class="text-primary w-8 h-8"></i>
+                        </div>
+                        <div class="w-1/3 h-1 bg-white/10 rounded-full"></div>
+                    </div>
+
+                    <!-- Card -->
+                    <div
+                        class="absolute right-[5%] bottom-[20%] w-[55%] h-[35%] glass-panel rounded-xl z-30 shadow-[10px_20px_40px_rgba(0,0,0,0.6)] border border-primary/30 transform rotate-12 transition-transform hover:rotate-6 duration-500 flex flex-col p-4 justify-between bg-gradient-to-br from-primary/5 to-transparent backdrop-blur-xl">
+                        <div class="flex justify-between items-start">
+                            <i data-lucide="nfc" class="text-primary w-5 h-5"></i>
+                            <div class="h-2 w-8 bg-white/20 rounded"></div>
+                        </div>
+                        <div>
+                            <p class="font-syne font-bold text-white text-lg tracking-wider">HayatID</p>
+                            <p class="text-gray-400 text-[10px] mt-1">Dossier Médical NFC</p>
+                        </div>
+                    </div>
+
+                    <!-- NFC Waves -->
+                    <div class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                        <div
+                            class="w-32 h-32 border border-primary/30 rounded-full opacity-0 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite_0.5s]">
+                        </div>
+                        <div
+                            class="w-48 h-48 border border-primary/20 rounded-full absolute opacity-0 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite_1s]">
+                        </div>
+                        <div
+                            class="w-64 h-64 border border-primary/10 rounded-full absolute opacity-0 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite_1.5s]">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <a href="#waitlist"
+                class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-medium rounded-xl text-[#060A12] bg-primary hover:bg-primary-hover transition-all duration-300 shadow-[0_0_20px_rgba(14,165,233,0.3)] hover:shadow-[0_0_30px_rgba(14,165,233,0.5)] transform hover:-translate-y-1">
+                Rejoindre la liste d'attente
+                <i data-lucide="arrow-right" class="ml-2 -mr-1 w-5 h-5"></i>
+            </a>
+        </section>
+
+        <!-- Mission Section -->
+        <section id="mission" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-32">
+            <div class="text-center mb-16 animate-on-scroll">
+                <h2 class="font-syne text-3xl md:text-5xl font-bold text-white mb-4">Notre Mission</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Sauver des vies en rendant l'information médicale
+                    instantanément accessible au personnel soignant.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div
+                    class="glass-panel p-8 rounded-2xl animate-on-scroll hover:border-primary/30 transition-colors group">
+                    <div
+                        class="w-14 h-14 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="siren" class="text-red-400 w-7 h-7"></i>
+                    </div>
+                    <h3 class="font-syne text-xl font-bold text-white mb-3">Urgence Absolue</h3>
+                    <p class="text-gray-400 font-light leading-relaxed">En cas d'accident, les secouristes scannent la
+                        carte pour accéder aux allergies, groupe sanguin et antécédents médicaux vitaux.</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass-panel p-8 rounded-2xl animate-on-scroll hover:border-purple-500/30 transition-colors group"
+                    style="transition-delay: 100ms;">
+                    <div
+                        class="w-14 h-14 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="shield-check" class="text-purple-400 w-7 h-7"></i>
+                    </div>
+                    <h3 class="font-syne text-xl font-bold text-white mb-3">Contrôle Total</h3>
+                    <p class="text-gray-400 font-light leading-relaxed">Vous restez maître de vos données. L'accès est
+                        crypté et vous décidez quelles informations partager avec quel professionnel de santé.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass-panel p-8 rounded-2xl animate-on-scroll hover:border-primary/30 transition-colors group"
+                    style="transition-delay: 200ms;">
+                    <div
+                        class="w-14 h-14 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="wallet" class="text-primary w-7 h-7"></i>
+                    </div>
+                    <h3 class="font-syne text-xl font-bold text-white mb-3">Portabilité</h3>
+                    <p class="text-gray-400 font-light leading-relaxed">Plus de dossiers papier perdus. Que ce soit une
+                        carte physique NFC, un bracelet ou sur votre téléphone, votre santé vous suit partout.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Constat & Solution Section -->
+        <section id="solution" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-32">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Problème -->
+                <div class="glass-panel p-8 md:p-12 rounded-3xl animate-on-scroll relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-red-500/5 rounded-full blur-3xl -mr-20 -mt-20 transition-all duration-500 group-hover:bg-red-500/10"></div>
+                    <div class="flex items-center gap-4 mb-8 relative z-10">
+                        <div class="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/20">
+                            <i data-lucide="alert-triangle" class="text-red-400 w-6 h-6"></i>
+                        </div>
+                        <h2 class="font-syne text-2xl md:text-3xl font-bold text-white">Le Problème</h2>
+                    </div>
+                    <div class="space-y-6 relative z-10">
+                        <p class="text-gray-400 text-lg leading-relaxed">
+                            Chaque année au Maroc, des milliers de patients arrivent inconscients aux urgences. Le médecin urgentiste ignore leur <strong>groupe sanguin, allergies, ou traitements en cours</strong>.
+                        </p>
+                        <div class="p-4 rounded-xl bg-[#060A12]/50 border border-white/5 border-l-2 border-l-red-500/50">
+                            <p class="text-white font-medium">75% des décès au Maroc</p>
+                            <p class="text-sm text-gray-400 mt-1">sont dus aux maladies non-transmissibles. L'information vitale existe, mais reste introuvable au moment critique.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Solution -->
+                <div class="glass-panel p-8 md:p-12 rounded-3xl animate-on-scroll relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20 transition-all duration-500 group-hover:bg-primary/10"></div>
+                    <div class="flex items-center gap-4 mb-8 relative z-10">
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
+                            <i data-lucide="check-circle" class="text-primary w-6 h-6"></i>
+                        </div>
+                        <h2 class="font-syne text-2xl md:text-3xl font-bold text-white">La Solution HayatID</h2>
+                    </div>
+                    <div class="space-y-6 relative z-10">
+                        <p class="text-gray-400 text-lg leading-relaxed">
+                            Une simple carte <strong>NFC + QR code</strong>. En cas d'urgence, n'importe quel passant ou médecin peut la scanner avec son smartphone.
+                        </p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="zap" class="text-primary w-5 h-5 mt-1 shrink-0"></i>
+                                <div>
+                                    <span class="text-white font-medium block">En 2 secondes : Informations Vitales</span>
+                                    <span class="text-sm text-gray-400">Accès immédiat et sans compte aux allergies, groupe sanguin et contacts d'urgence.</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="lock" class="text-purple-400 w-5 h-5 mt-1 shrink-0"></i>
+                                <div>
+                                    <span class="text-white font-medium block">En 15 secondes : Dossier Médical (Pro)</span>
+                                    <span class="text-sm text-gray-400">Le médecin s'authentifie via OTP pour accéder au dossier complet.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Différenciateurs / Pourquoi Nous -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-32">
+            <div class="text-center mb-16 animate-on-scroll">
+                <h2 class="font-syne text-3xl md:text-5xl font-bold text-white mb-4">L'Avantage HayatID</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Une technologie pensée pour l'adoption massive et la fiabilité médicale.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Feature 1 -->
+                <div class="glass-panel p-6 rounded-2xl animate-on-scroll hover:border-primary/30 transition-colors">
+                    <i data-lucide="smartphone" class="text-primary w-8 h-8 mb-4"></i>
+                    <h3 class="font-syne text-lg font-bold text-white mb-2">Zéro Application</h3>
+                    <p class="text-sm text-gray-400">Le scan se fait via le navigateur natif du lecteur. Rien à télécharger, compatible avec 100% des smartphones.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="glass-panel p-6 rounded-2xl animate-on-scroll hover:border-primary/30 transition-colors" style="transition-delay: 100ms;">
+                    <i data-lucide="badge-check" class="text-purple-400 w-8 h-8 mb-4"></i>
+                    <h3 class="font-syne text-lg font-bold text-white mb-2">Données Vérifiées</h3>
+                    <p class="text-sm text-gray-400">Les informations médicales sont validées par des professionnels créant une asymétrie de confiance unique.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="glass-panel p-6 rounded-2xl animate-on-scroll hover:border-primary/30 transition-colors" style="transition-delay: 200ms;">
+                    <i data-lucide="network" class="text-primary w-8 h-8 mb-4"></i>
+                    <h3 class="font-syne text-lg font-bold text-white mb-2">Réseau Pharmacies</h3>
+                    <p class="text-sm text-gray-400">Distribution facilitée grâce à notre intégration avec plus de 12 000 pharmacies à l'échelle nationale.</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="glass-panel p-6 rounded-2xl animate-on-scroll hover:border-primary/30 transition-colors" style="transition-delay: 300ms;">
+                    <i data-lucide="credit-card" class="text-yellow-400 w-8 h-8 mb-4"></i>
+                    <h3 class="font-syne text-lg font-bold text-white mb-2">Gratuit (Patient)</h3>
+                    <p class="text-sm text-gray-400">Abonnement gratuit pour le grand public. Seul le coût de la carte physique (environ 50 MAD) est requis.</p>
+                </div>
+            </div>
+            
+            <!-- Statistiques / Validation -->
+            <div class="mt-12 glass-panel p-8 rounded-3xl border-primary/20 bg-primary/5 animate-on-scroll flex flex-col md:flex-row items-center justify-around gap-8 text-center">
+                <div>
+                    <div class="text-3xl md:text-4xl font-syne font-bold text-white mb-1">66</div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wider">Tests Réels</div>
+                </div>
+                <div class="w-px h-12 bg-white/10 hidden md:block"></div>
+                <div>
+                    <div class="text-3xl md:text-4xl font-syne font-bold text-primary mb-1">88%</div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wider">Taux d'adoption</div>
+                </div>
+                <div class="w-px h-12 bg-white/10 hidden md:block"></div>
+                <div>
+                    <div class="text-3xl md:text-4xl font-syne font-bold text-white mb-1">91%</div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wider">Confirment le constat</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comment ça marche -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-32 relative">
+            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
+            
+            <div class="text-center mb-16 animate-on-scroll relative z-10">
+                <span class="text-purple-400 font-bold tracking-wider uppercase text-sm mb-2 block">Simplicité Absolue</span>
+                <h2 class="font-syne text-3xl md:text-5xl font-bold text-white mb-4">Comment ça marche ?</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Trois étapes simples pour sécuriser votre santé, sans aucune friction technique.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+                <!-- Étape 1 -->
+                <div class="relative group animate-on-scroll">
+                    <div class="glass-panel p-8 rounded-3xl h-full border-t border-white/10 group-hover:-translate-y-2 transition-transform duration-300">
+                        <div class="absolute -top-6 left-8 w-12 h-12 bg-[#060A12] border border-white/20 rounded-full flex items-center justify-center font-syne font-bold text-xl text-white">1</div>
+                        <i data-lucide="scan-line" class="text-gray-400 w-10 h-10 mb-6 group-hover:text-primary transition-colors mt-4"></i>
+                        <h3 class="font-syne text-xl font-bold text-white mb-3">Obtenez votre carte</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Récupérez votre carte NFC HayatID physique (50-80 MAD) dans l'une de nos pharmacies partenaires. Elle est prête à l'emploi.</p>
+                    </div>
+                    <!-- Connexion visuelle -->
+                    <div class="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-white/20 to-transparent"></div>
+                </div>
+
+                <!-- Étape 2 -->
+                <div class="relative group animate-on-scroll" style="transition-delay: 100ms;">
+                    <div class="glass-panel p-8 rounded-3xl h-full border-t border-white/10 group-hover:-translate-y-2 transition-transform duration-300">
+                        <div class="absolute -top-6 left-8 w-12 h-12 bg-[#060A12] border border-white/20 rounded-full flex items-center justify-center font-syne font-bold text-xl text-white">2</div>
+                        <i data-lucide="radio" class="text-gray-400 w-10 h-10 mb-6 group-hover:text-purple-400 transition-colors mt-4"></i>
+                        <h3 class="font-syne text-xl font-bold text-white mb-3">Le Scan d'Urgence</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">En cas de besoin, un secouriste scanne la carte ou le QR code. Les infos vitales (groupe sanguin, allergies) s'affichent instantanément.</p>
+                    </div>
+                    <!-- Connexion visuelle -->
+                    <div class="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-white/20 to-transparent"></div>
+                </div>
+
+                <!-- Étape 3 -->
+                <div class="relative group animate-on-scroll" style="transition-delay: 200ms;">
+                    <div class="glass-panel p-8 rounded-3xl h-full border-t border-white/10 group-hover:-translate-y-2 transition-transform duration-300">
+                        <div class="absolute -top-6 left-8 w-12 h-12 bg-[#060A12] border border-white/20 rounded-full flex items-center justify-center font-syne font-bold text-xl text-white">3</div>
+                        <i data-lucide="shield" class="text-gray-400 w-10 h-10 mb-6 group-hover:text-primary transition-colors mt-4"></i>
+                        <h3 class="font-syne text-xl font-bold text-white mb-3">Accès Sécurisé (Pro)</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Pour aller plus loin, les professionnels s'authentifient via un code OTP (envoyé en 15s) pour accéder au dossier complet.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Roadmap -->
+        <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-40 border-t border-white/5 pt-20">
+            <div class="text-center mb-16 animate-on-scroll">
+                <span class="text-primary font-bold tracking-wider uppercase text-sm mb-2 block">Vision Stratégique</span>
+                <h2 class="font-syne text-3xl md:text-5xl font-bold text-white mb-4">Notre Roadmap</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">De Marrakech à l'Afrique, l'évolution de l'identité médicale.</p>
+            </div>
+
+            <div class="relative border-l border-white/10 ml-4 md:ml-0 md:border-l-0 md:border-t md:flex md:justify-between pt-8 md:pt-12 text-left md:text-center animate-on-scroll">
+                
+                <!-- 2026 -->
+                <div class="relative pl-8 md:pl-0 md:w-1/3 pb-12 md:pb-0 group mt-4 md:mt-0">
+                    <div class="absolute left-[-5px] top-0 md:top-[-53px] md:left-1/2 md:-translate-x-1/2 w-3 h-3 rounded-full bg-primary shadow-[0_0_15px_#0ea5e9]"></div>
+                    <h3 class="font-syne text-2xl font-bold text-white mb-2">2026</h3>
+                    <h4 class="text-primary font-medium mb-3">Phase Pilote — Marrakech</h4>
+                    <p class="text-gray-400 text-sm group-hover:text-white transition-colors">Déploiement ciblé avec 1 000 profils actifs. Intégration dans 10 établissements cliniques et pharmacies partenaires.</p>
+                </div>
+
+                <!-- 2027 -->
+                <div class="relative pl-8 md:pl-0 md:w-1/3 pb-12 md:pb-0 group mt-4 md:mt-0">
+                    <div class="absolute left-[-5px] top-0 md:top-[-53px] md:left-1/2 md:-translate-x-1/2 w-3 h-3 rounded-full bg-white/20 group-hover:bg-purple-400 transition-colors"></div>
+                    <h3 class="font-syne text-2xl font-bold text-gray-300 mb-2">2027</h3>
+                    <h4 class="text-purple-400 font-medium mb-3">Déploiement National</h4>
+                    <p class="text-gray-400 text-sm group-hover:text-white transition-colors">Extension à l'ensemble du territoire marocain. Interconnexion technique avec le DMP (Dossier Médical Partagé) et la CNSS.</p>
+                </div>
+
+                <!-- 2028 -->
+                <div class="relative pl-8 md:pl-0 md:w-1/3 group mt-4 md:mt-0">
+                    <div class="absolute left-[-5px] top-0 md:top-[-53px] md:left-1/2 md:-translate-x-1/2 w-3 h-3 rounded-full bg-white/20 group-hover:bg-primary transition-colors"></div>
+                    <h3 class="font-syne text-2xl font-bold text-gray-300 mb-2">2028</h3>
+                    <h4 class="text-primary font-medium mb-3">Expansion MENA</h4>
+                    <p class="text-gray-400 text-sm group-hover:text-white transition-colors">Adaptation réglementaire et exportation du modèle vers le Sénégal, la Côte d'Ivoire et la Tunisie.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- L'Équipe -->
+        <section id="equipe" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-40 mb-20 animate-on-scroll">
+            <div class="glass-panel rounded-3xl p-8 md:p-16 border-primary/10 relative overflow-hidden">
+                <div class="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-primary/5 to-transparent"></div>
+                
+                <div class="text-center relative z-10 mb-12">
+                    <h2 class="font-syne text-3xl md:text-5xl font-bold text-white mb-4">Propulsé par 2KS</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto border-b border-white/5 pb-6">Soutenu par <span class="text-white font-semibold">Enactus FSJES UCA Marrakech</span>. Notre force réside dans la pluridisciplinarité de nos experts.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10 text-center mt-8">
+                    <!-- Fondateur -->
+                    <div class="p-4 group">
+                        <div class="w-16 h-16 mx-auto bg-white/5 rounded-2xl flex items-center justify-center rotate-3 mb-4 border border-white/10 group-hover:scale-110 group-hover:border-primary/50 transition-all">
+                            <i data-lucide="user" class="text-primary w-8 h-8 -rotate-3"></i>
+                        </div>
+                        <h3 class="font-syne font-bold text-white text-lg">Lamani Mohamed</h3>
+                        <p class="text-primary text-sm mb-2">Fondateur & CEO</p>
+                    </div>
+                    
+                    <!-- Medical -->
+                    <div class="p-4 group">
+                        <div class="w-16 h-16 mx-auto bg-white/5 rounded-2xl flex items-center justify-center -rotate-3 mb-4 border border-white/10 group-hover:scale-110 group-hover:border-purple-400/50 transition-all">
+                            <i data-lucide="stethoscope" class="text-purple-400 w-8 h-8 rotate-3"></i>
+                        </div>
+                        <h3 class="font-syne font-bold text-white text-lg">Garant Médical</h3>
+                        <p class="text-purple-400 text-sm mb-2">Pharmacien CMO</p>
+                    </div>
+
+                    <!-- Tech -->
+                    <div class="p-4 group">
+                        <div class="w-16 h-16 mx-auto bg-white/5 rounded-2xl flex items-center justify-center rotate-6 mb-4 border border-white/10 group-hover:scale-110 group-hover:border-primary/50 transition-all">
+                            <i data-lucide="code-2" class="text-primary w-8 h-8 -rotate-6"></i>
+                        </div>
+                        <h3 class="font-syne font-bold text-white text-lg">Tech & UX</h3>
+                        <p class="text-primary text-sm mb-2">CTO & Dev Team</p>
+                    </div>
+
+                    <!-- Ops -->
+                    <div class="p-4 group">
+                        <div class="w-16 h-16 mx-auto bg-white/5 rounded-2xl flex items-center justify-center -rotate-6 mb-4 border border-white/10 group-hover:scale-110 group-hover:border-yellow-400/50 transition-all">
+                            <i data-lucide="briefcase" class="text-yellow-400 w-8 h-8 rotate-6"></i>
+                        </div>
+                        <h3 class="font-syne font-bold text-white text-lg">Opérations</h3>
+                        <p class="text-yellow-400 text-sm mb-2">COO & CFO</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Waitlist Section -->
+        <section id="waitlist" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-32 animate-on-scroll">
+            <div class="glass-panel rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
+                <!-- Inner glow -->
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-1/2 bg-primary/10 blur-3xl rounded-full">
+                </div>
+
+                <h2 class="font-syne text-3xl md:text-5xl font-bold text-white mb-4 relative z-10">Soyez parmis les
+                    premiers</h2>
+                <p class="text-gray-400 mb-8 max-w-xl mx-auto relative z-10">Inscrivez-vous à notre liste d'attente pour
+                    un accès anticipé et tenir au courant du lancement officiel.</p>
+
+                <form id="waitlist-form" class="relative z-10 max-w-md mx-auto"
+                    onsubmit="event.preventDefault(); document.getElementById('success-message').classList.remove('hidden'); this.reset();">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input type="email" required placeholder="votre@email.com"
+                            class="flex-1 bg-[#060A12]/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors">
+                        <button type="submit"
+                            class="bg-white text-[#060A12] font-semibold px-6 py-3 rounded-xl hover:bg-gray-200 transition-colors whitespace-nowrap">
+                            Je m'inscris
+                        </button>
+                    </div>
+                </form>
+
+                <div id="success-message" class="hidden mt-6 flex items-center justify-center gap-2 text-primary">
+                    <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                    <span>Merci ! Vous êtes sur la liste.</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 bg-[#060A12] relative z-20 mt-32">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="activity" class="text-primary w-6 h-6"></i>
+                    <span class="font-syne text-xl text-white">HayatID</span>
+                </div>
+
+                <div class="flex gap-6">
+                    <a href="#" class="text-gray-500 hover:text-white transition-colors">
+                        <span class="sr-only">LinkedIn</span>
+                        <i data-lucide="linkedin" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-white transition-colors">
+                        <span class="sr-only">Twitter</span>
+                        <i data-lucide="twitter" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-white transition-colors">
+                        <span class="sr-only">Instagram</span>
+                        <i data-lucide="instagram" class="w-5 h-5"></i>
+                    </a>
+                </div>
+
+                <p class="text-sm text-gray-500 text-center md:text-right">
+                    © 2026 HayatID · 2KS<br>
+                    <span class="text-xs">Fait avec cœur au Maroc 🇲🇦</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Initialize Icons & Scroll Animation -->
+    <script>
+        // Init Lucide Icons
+        lucide.createIcons();
+
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in-up');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach((elem) => {
+            observer.observe(elem);
+        });
+    </script>
+</body>
+
+</html>
